@@ -32,11 +32,19 @@ yarn-error.log*
 *.log
 *.tmp
 *.bak
+**/App_Data/Logs/
+**/Logs.txt
 Thumbs.db
 ehthumbs.db
 [Dd]esktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+## CRITICAL: Explicitly ALLOW Word Documents & Demo Videos
+!*.docx
+!videos/**
+!videos/*
+!*.html
 
 ## Keep client bundles in wwwroot
 !**/wwwroot/view-resources/Views/_Bundles/**
