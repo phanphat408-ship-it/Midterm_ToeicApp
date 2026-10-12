@@ -1,0 +1,11 @@
+@using ToeicReadingApp.Web.Views.Shared.Components.SideBarUserArea
+@model SideBarUserAreaViewModel
+
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+    <div class="image">
+        <img src="~/img/avatar.png" class="img-circle elevation-2" alt="User Image" style="width: 36px !important; height: 36px !important; max-width: 36px !important; max-height: 36px !important; object-fit: cover !important; border-radius: 50% !important;">
+    </div>
+    <div class="info">
+        <a class="d-block" href="javascript:void(0);">@Html.Raw(Model.GetShownLoginName())</a>
+    </div>
+</div>

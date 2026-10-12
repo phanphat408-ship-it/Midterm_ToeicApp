@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Cơ sở Dữ liệu (ER Diagram) - Hệ thống Thi TOEIC Reading</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #1E3A8A;
+            --primary-light: #3B82F6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --border: #E2E8F0;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            padding: 30px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 24px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #EFF6FF;
+            color: var(--primary);
+            border: 1px solid #DBEAFE;
+        }
+
+        .badge-green { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
+        .badge-amber { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+
+        .diagram-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #F1F5F9;
+            padding-bottom: 12px;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background: #FAFAFA;
+            border-radius: 14px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .grid-tables {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .table-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            padding: 14px 18px;
+            background: #1E3A8A;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header.group-pink { background: #0F766E; }
+        .card-header.group-amber { background: #B45309; }
+        .card-header.group-purple { background: #6D28D9; }
+
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .card-header span {
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #F8FAFC;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .col-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .col-type {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            font-size: 11.5px;
+        }
+
+        .key-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .key-pk { background: #FEF3C7; color: #92400E; }
+        .key-fk { background: #DBEAFE; color: #1E40AF; }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>SƠ ĐỒ CƠ SỞ DỮ LIỆU (DATABASE ER DIAGRAM)</h1>
+            <p>Phân hệ Quản lý & Thi TOEIC Reading (Part 5: Độc lập; Part 6 & 7: Nhóm bài đọc/đoạn văn + Hình ảnh)</p>
+            <div class="badges">
+                <span class="badge">ASP.NET Boilerplate v10.2.0</span>
+                <span class="badge badge-green">Entity Framework Core 9.0</span>
+                <span class="badge badge-amber">Microsoft SQL Server</span>
+                <span class="badge">N-Layer Clean Architecture</span>
+                <span class="badge badge-green">Flutter Mobile Ready</span>
+            </div>
+        </div>
+
+        <!-- VISUAL DIAGRAM -->
+        <div class="diagram-section">
+            <div class="section-title">
+                📊 Sơ đồ Quan hệ Thực thể (Entity Relationship Diagram)
+            </div>
+            
+            <div class="mermaid">
+erDiagram
+    AppExams ||--o{ AppExamParts : "1 - N (Chứa các Part 5, 6, 7)"
+    AppExamParts ||--o{ AppQuestionGroups : "1 - N (Chứa nhóm bài đọc Part 6, 7)"
+    AppExamParts ||--o{ AppQuestions : "1 - N (Chứa câu hỏi)"
+    AppQuestionGroups ||--o{ AppQuestions : "1 - N (Nhóm chứa 2-5 câu)"
+    AppExams ||--o{ AppExamAttempts : "1 - N (Thí sinh làm bài thi)"
+    AppExamAttempts ||--o{ AppExamAttemptDetails : "1 - N (Chi tiết từng câu trả lời)"
+    AppQuestions ||--o{ AppExamAttemptDetails : "1 - N (So khớp đáp án)"
+
+    AppExams {
+        int Id PK
+        string Title "Tên đề thi (max 256)"
+        int DurationMinutes "Thời gian (75 phút)"
+        int TotalQuestions "Tổng số câu (100 câu)"
+        string Description "Mô tả đề thi"
+        bool IsPublished "Trạng thái công khai"
+    }
+
+    AppExamParts {
+        int Id PK
+        int ExamId FK "Khóa ngoại tới AppExams"
+        int PartNumber "Phần thi: 5, 6 hoặc 7"
+        string Title "PART 5, PART 6, PART 7"
+        string Directions "Hướng dẫn làm bài"
+    }
+
+    AppQuestionGroups {
+        int Id PK
+        int ExamPartId FK "Khóa ngoại tới AppExamParts"
+        string GroupTitle "Tiêu đề nhóm (Questions 131-134...)"
+        string PassageText "Đoạn văn bài đọc (Nvarchar Max)"
+        string ImageUrl "Đường dẫn hình ảnh bài đọc"
+        int OrderIndex "Thứ tự sắp xếp đoạn văn"
+    }
+
+    AppQuestions {
+        int Id PK
+        int ExamId FK "Khóa ngoại tới AppExams"
+        int ExamPartId FK "Khóa ngoại tới AppExamParts"
+        int QuestionGroupId FK "Khóa ngoại nhóm (Null ở Part 5)"
+        int QuestionNumber "Số câu (101 đến 200)"
+        string QuestionText "Nội dung câu hỏi"
+        string OptionA "Đáp án A"
+        string OptionB "Đáp án B"
+        string OptionC "Đáp án C"
+        string OptionD "Đáp án D"
+        string CorrectAnswer "Đáp án đúng (A, B, C, D)"
+    }
+
+    AppExamAttempts {
+        int Id PK
+        int ExamId FK "Khóa ngoại tới AppExams"
+        string StudentName "Tên thí sinh làm bài"
+        datetime StartTime "Thời gian bắt đầu"
+        datetime SubmitTime "Thời gian nộp bài"
+        int TotalCorrect "Tổng số câu đúng"
+        int TotalWrong "Tổng số câu sai"
+        int TotalSkipped "Tổng số câu bỏ qua"
+        int Score "Điểm TOEIC (5 - 495)"
+    }
+
+    AppExamAttemptDetails {
+        int Id PK
+        int ExamAttemptId FK "Khóa ngoại tới AppExamAttempts"
+        int QuestionId FK "Khóa ngoại tới AppQuestions"
+        int QuestionNumber "Số thứ tự câu (101-200)"
+        string SelectedOption "Đáp án thí sinh chọn (A/B/C/D)"
+        string CorrectOption "Đáp án đúng của đề"
+        bool IsCorrect "Kết quả đúng/sai"
+    }
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><span class="key-badge key-pk">PK</span> Khóa chính (Primary Key)</div>
+                <div class="legend-item"><span class="key-badge key-fk">FK</span> Khóa ngoại (Foreign Key)</div>
+                <div class="legend-item"><strong>||--o{</strong> Quan hệ 1 - Nhiều (One-to-Many)</div>
+                <div class="legend-item">🛡️ Đã cấu hình <code>DeleteBehavior.Restrict</code> chống Multiple Cascade Paths</div>
+            </div>
+        </div>
+
+        <!-- DETAILED TABLES DICTIONARY -->
+        <div class="diagram-section">
+            <div class="section-title">
+                🗄️ Bảng Đặc tả Chi tiết các Bảng Dữ liệu (Data Dictionary)
+            </div>
+
+            <div class="grid-tables">
+                <!-- AppExams -->
+                <div class="table-card">
+                    <div class="card-header">
+                        <h3>AppExams</h3>
+                        <span>Đề thi TOEIC Reading</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Khóa</th><th>Tên Cột</th><th>Kiểu Dữ Liệu</th><th>Ghi chú</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="key-badge key-pk">PK</span></td><td class="col-name">Id</td><td class="col-type">INT</td><td>Identity</td></tr>
+                            <tr><td></td><td class="col-name">Title</td><td class="col-type">NVARCHAR(256)</td><td>Required</td></tr>
+                            <tr><td></td><td class="col-name">DurationMinutes</td><td class="col-type">INT</td><td>Default = 75</td></tr>
+                            <tr><td></td><td class="col-name">TotalQuestions</td><td class="col-type">INT</td><td>Default = 100</td></tr>
+                            <tr><td></td><td class="col-name">Description</td><td class="col-type">NVARCHAR(MAX)</td><td>Nullable</td></tr>
+                            <tr><td></td><td class="col-name">IsPublished</td><td class="col-type">BIT</td><td>Default = 1</td></tr>
+                            <tr><td></td><td class="col-name">CreationTime</td><td class="col-type">DATETIME2</td><td>ABP Audited</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AppExamParts -->
+                <div class="table-card">
+                    <div class="card-header group-pink">
+                        <h3>AppExamParts</h3>
+                        <span>Phần thi (Part 5, 6, 7)</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Khóa</th><th>Tên Cột</th><th>Kiểu Dữ Liệu</th><th>Ghi chú</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="key-badge key-pk">PK</span></td><td class="col-name">Id</td><td class="col-type">INT</td><td>Identity</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">ExamId</td><td class="col-type">INT</td><td>-> AppExams(Id)</td></tr>
+                            <tr><td></td><td class="col-name">PartNumber</td><td class="col-type">INT</td><td>5, 6, 7</td></tr>
+                            <tr><td></td><td class="col-name">Title</td><td class="col-type">NVARCHAR(64)</td><td>"PART 5/6/7"</td></tr>
+                            <tr><td></td><td class="col-name">Directions</td><td class="col-type">NVARCHAR(MAX)</td><td>Hướng dẫn part</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AppQuestionGroups -->
+                <div class="table-card">
+                    <div class="card-header group-amber">
+                        <h3>AppQuestionGroups</h3>
+                        <span>Đoạn văn & Ảnh bài đọc</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Khóa</th><th>Tên Cột</th><th>Kiểu Dữ Liệu</th><th>Ghi chú</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="key-badge key-pk">PK</span></td><td class="col-name">Id</td><td class="col-type">INT</td><td>Identity</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">ExamPartId</td><td class="col-type">INT</td><td>-> AppExamParts(Id)</td></tr>
+                            <tr><td></td><td class="col-name">GroupTitle</td><td class="col-type">NVARCHAR(512)</td><td>Questions 131-134...</td></tr>
+                            <tr><td></td><td class="col-name">PassageText</td><td class="col-type">NVARCHAR(MAX)</td><td>Văn bản bài đọc</td></tr>
+                            <tr><td></td><td class="col-name">ImageUrl</td><td class="col-type">NVARCHAR(1000)</td><td>Ảnh trích xuất Word</td></tr>
+                            <tr><td></td><td class="col-name">OrderIndex</td><td class="col-type">INT</td><td>Thứ tự hiển thị</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AppQuestions -->
+                <div class="table-card">
+                    <div class="card-header">
+                        <h3>AppQuestions</h3>
+                        <span>100 Câu hỏi & 4 Đáp án</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Khóa</th><th>Tên Cột</th><th>Kiểu Dữ Liệu</th><th>Ghi chú</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="key-badge key-pk">PK</span></td><td class="col-name">Id</td><td class="col-type">INT</td><td>Identity</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">ExamId</td><td class="col-type">INT</td><td>-> AppExams(Id)</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">ExamPartId</td><td class="col-type">INT</td><td>-> AppExamParts(Id)</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">QuestionGroupId</td><td class="col-type">INT</td><td>Null ở Part 5</td></tr>
+                            <tr><td></td><td class="col-name">QuestionNumber</td><td class="col-type">INT</td><td>101 đến 200</td></tr>
+                            <tr><td></td><td class="col-name">QuestionText</td><td class="col-type">NVARCHAR(MAX)</td><td>Nội dung câu hỏi</td></tr>
+                            <tr><td></td><td class="col-name">OptionA / B / C / D</td><td class="col-type">NVARCHAR(MAX)</td><td>4 Lựa chọn</td></tr>
+                            <tr><td></td><td class="col-name">CorrectAnswer</td><td class="col-type">NVARCHAR(10)</td><td>"A", "B", "C", "D"</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AppExamAttempts -->
+                <div class="table-card">
+                    <div class="card-header group-purple">
+                        <h3>AppExamAttempts</h3>
+                        <span>Lịch sử làm bài thi</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Khóa</th><th>Tên Cột</th><th>Kiểu Dữ Liệu</th><th>Ghi chú</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="key-badge key-pk">PK</span></td><td class="col-name">Id</td><td class="col-type">INT</td><td>Identity</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">ExamId</td><td class="col-type">INT</td><td>-> AppExams(Id)</td></tr>
+                            <tr><td></td><td class="col-name">StudentName</td><td class="col-type">NVARCHAR(256)</td><td>Tên thí sinh</td></tr>
+                            <tr><td></td><td class="col-name">StartTime</td><td class="col-type">DATETIME2</td><td>Bắt đầu làm</td></tr>
+                            <tr><td></td><td class="col-name">SubmitTime</td><td class="col-type">DATETIME2</td><td>Thời điểm nộp</td></tr>
+                            <tr><td></td><td class="col-name">TotalCorrect / Wrong / Skipped</td><td class="col-type">INT</td><td>Thống kê</td></tr>
+                            <tr><td></td><td class="col-name">Score</td><td class="col-type">INT</td><td>Điểm TOEIC (5-495)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AppExamAttemptDetails -->
+                <div class="table-card">
+                    <div class="card-header group-purple">
+                        <h3>AppExamAttemptDetails</h3>
+                        <span>Chi tiết từng câu chấm điểm</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Khóa</th><th>Tên Cột</th><th>Kiểu Dữ Liệu</th><th>Ghi chú</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="key-badge key-pk">PK</span></td><td class="col-name">Id</td><td class="col-type">INT</td><td>Identity</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">ExamAttemptId</td><td class="col-type">INT</td><td>-> AppExamAttempts</td></tr>
+                            <tr><td><span class="key-badge key-fk">FK</span></td><td class="col-name">QuestionId</td><td class="col-type">INT</td><td>-> AppQuestions</td></tr>
+                            <tr><td></td><td class="col-name">QuestionNumber</td><td class="col-type">INT</td><td>Số câu (101-200)</td></tr>
+                            <tr><td></td><td class="col-name">SelectedOption</td><td class="col-type">NVARCHAR(10)</td><td>Thí sinh chọn (null nếu bỏ qua)</td></tr>
+                            <tr><td></td><td class="col-name">CorrectOption</td><td class="col-type">NVARCHAR(10)</td><td>Đáp án đúng</td></tr>
+                            <tr><td></td><td class="col-name">IsCorrect</td><td class="col-type">BIT</td><td>Đúng = 1, Sai = 0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#1E3A8A',
+                primaryTextColor: '#FFFFFF',
+                primaryBorderColor: '#1E3A8A',
+                lineColor: '#2563EB',
+                secondaryColor: '#ECFDF5',
+                tertiaryColor: '#FFFFFF'
+            }
+        });
+    </script>
+</body>
+</html>

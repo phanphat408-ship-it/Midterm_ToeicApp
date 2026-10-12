@@ -1,0 +1,687 @@
+@using ToeicReadingApp.Web.Startup
+@using ToeicReadingApp.Exams.Dto
+@model ExamDetailDto
+@{
+    ViewBag.Title = $"Xem trước & Sửa: {Model.Title}";
+    ViewBag.CurrentPageName = PageNames.Exams;
+
+    var part5 = Model.Parts.FirstOrDefault(p => p.PartNumber == 5);
+    var part6 = Model.Parts.FirstOrDefault(p => p.PartNumber == 6);
+    var part7 = Model.Parts.FirstOrDefault(p => p.PartNumber == 7);
+}
+
+<style>
+    .preview-header {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 20px 24px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.06);
+        margin-bottom: 24px;
+    }
+    .option-item {
+        padding: 10px 14px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+    .option-item.correct {
+        background-color: #ecfdf5;
+        border-color: #a7f3d0;
+        color: #065f46;
+        font-weight: 600;
+    }
+    .badge-ans {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .passage-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #3b82f6;
+        border-radius: 10px;
+        padding: 22px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .passage-text {
+        white-space: pre-wrap;
+        font-size: 0.96rem;
+        line-height: 1.65;
+        color: #334155;
+    }
+    .nav-tabs-modern {
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .nav-tabs-modern .nav-link {
+        border: none;
+        color: #64748b;
+        font-weight: 600;
+        padding: 14px 22px;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s ease;
+    }
+    .nav-tabs-modern .nav-link:hover {
+        color: #1e293b;
+    }
+    .nav-tabs-modern .nav-link.active {
+        color: #2563eb;
+        background: transparent;
+        border-bottom: 3px solid #2563eb;
+    }
+    .q-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .q-card:hover {
+        box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+</style>
+
+<div class="content-header p-0 mb-3">
+    <div class="container-fluid">
+        <!-- Top Navigation & Details -->
+        <div class="preview-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <div>
+                <a href="@Url.Action("Index", "Exams")" class="btn btn-outline-secondary btn-sm mb-2 shadow-sm font-weight-bold">
+                    <i class="fas fa-arrow-left mr-1"></i> Về danh sách đề thi
+                </a>
+                <h3 class="font-weight-bold text-dark mb-1">
+                    <i class="fas fa-file-alt text-primary mr-2"></i>@Model.Title
+                </h3>
+                <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+                    <span class="badge badge-warning px-3 py-2 mr-2 font-weight-bold text-dark" style="border-radius: 8px;">
+                        <i class="far fa-clock mr-1"></i>@Model.DurationMinutes phút
+                    </span>
+                    <span class="badge badge-info px-3 py-2 mr-2 font-weight-bold" style="border-radius: 8px;">
+                        <i class="fas fa-list-ol mr-1"></i>@Model.TotalQuestions câu hỏi
+                    </span>
+                    <span class="badge badge-success px-3 py-2 font-weight-bold" style="border-radius: 8px;">
+                        <i class="fas fa-check-circle mr-1"></i>Sẵn sàng luyện thi
+                    </span>
+                </div>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <a href="@Url.Action("Index", "Exams")" class="btn btn-primary font-weight-bold shadow-sm px-4 py-2">
+                    <i class="fas fa-check mr-1"></i> Hoàn tất & Đóng
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-header bg-white p-0">
+                <ul class="nav nav-tabs nav-tabs-modern px-3" id="examPartTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="part5-tab" data-toggle="pill" href="#part5" role="tab" aria-controls="part5" aria-selected="true">
+                            <i class="fas fa-font mr-2"></i>PART 5: Incomplete Sentences
+                            <span class="badge badge-primary ml-2">@(part5?.AllQuestions.Count ?? 0) câu</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="part6-tab" data-toggle="pill" href="#part6" role="tab" aria-controls="part6" aria-selected="false">
+                            <i class="fas fa-file-invoice mr-2"></i>PART 6: Text Completion
+                            <span class="badge badge-info ml-2">@(part6?.AllQuestions.Count ?? 0) câu</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="part7-tab" data-toggle="pill" href="#part7" role="tab" aria-controls="part7" aria-selected="false">
+                            <i class="fas fa-book-reader mr-2"></i>PART 7: Reading Comprehension
+                            <span class="badge badge-success ml-2">@(part7?.AllQuestions.Count ?? 0) câu</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="card-body p-4 bg-light">
+                <div class="tab-content" id="examPartTabsContent">
+                    
+                    @* ========================================= PART 5 ========================================= *@
+                    <div class="tab-pane fade show active" id="part5" role="tabpanel" aria-labelledby="part5-tab">
+                        @if (part5 != null)
+                        {
+                            <div class="alert alert-info bg-white border shadow-sm mb-4" style="border-left: 4px solid #0ea5e9 !important; border-radius: 8px;">
+                                <h6 class="font-weight-bold text-dark mb-1"><i class="fas fa-info-circle mr-1 text-info"></i> Hướng dẫn làm bài (Directions):</h6>
+                                <p class="mb-0 text-muted">@(string.IsNullOrWhiteSpace(part5.Directions) ? "In each question, you will find a word or phrase missing. Four answer choices are given. Choose the one that best completes the sentence." : part5.Directions)</p>
+                            </div>
+
+                            <div class="row">
+                                @foreach (var q in part5.AllQuestions.OrderBy(x => x.QuestionNumber))
+                                {
+                                    <div class="col-lg-6 mb-4" id="question-card-@q.Id">
+                                        <div class="q-card p-3 h-100">
+                                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                                <span class="badge badge-primary px-3 py-2 font-weight-bold" style="font-size: 0.95rem; border-radius: 6px;">
+                                                    Câu @q.QuestionNumber
+                                                </span>
+                                                <button type="button" class="btn btn-sm btn-outline-primary font-weight-bold btn-edit-question"
+                                                        data-id="@q.Id"
+                                                        data-num="@q.QuestionNumber"
+                                                        data-text="@q.QuestionText"
+                                                        data-a="@q.OptionA"
+                                                        data-b="@q.OptionB"
+                                                        data-c="@q.OptionC"
+                                                        data-d="@q.OptionD"
+                                                        data-ans="@q.CorrectAnswer">
+                                                    <i class="fas fa-edit mr-1"></i> Chỉnh sửa
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <p class="font-weight-bold text-dark mb-3 q-text-display" style="font-size: 1rem; line-height: 1.5;">@q.QuestionText</p>
+                                                <div class="options-container">
+                                                    <div class="option-item @(q.CorrectAnswer == "A" ? "correct" : "") opt-a-display">
+                                                        <span class="badge-ans @(q.CorrectAnswer == "A" ? "badge-success text-white" : "badge-light text-secondary")">A</span>
+                                                        <span class="opt-val flex-grow-1">@q.OptionA</span>
+                                                        @if (q.CorrectAnswer == "A") { <i class="fas fa-check-circle text-success ml-2"></i> }
+                                                    </div>
+                                                    <div class="option-item @(q.CorrectAnswer == "B" ? "correct" : "") opt-b-display">
+                                                        <span class="badge-ans @(q.CorrectAnswer == "B" ? "badge-success text-white" : "badge-light text-secondary")">B</span>
+                                                        <span class="opt-val flex-grow-1">@q.OptionB</span>
+                                                        @if (q.CorrectAnswer == "B") { <i class="fas fa-check-circle text-success ml-2"></i> }
+                                                    </div>
+                                                    <div class="option-item @(q.CorrectAnswer == "C" ? "correct" : "") opt-c-display">
+                                                        <span class="badge-ans @(q.CorrectAnswer == "C" ? "badge-success text-white" : "badge-light text-secondary")">C</span>
+                                                        <span class="opt-val flex-grow-1">@q.OptionC</span>
+                                                        @if (q.CorrectAnswer == "C") { <i class="fas fa-check-circle text-success ml-2"></i> }
+                                                    </div>
+                                                    <div class="option-item @(q.CorrectAnswer == "D" ? "correct" : "") opt-d-display">
+                                                        <span class="badge-ans @(q.CorrectAnswer == "D" ? "badge-success text-white" : "badge-light text-secondary")">D</span>
+                                                        <span class="opt-val flex-grow-1">@q.OptionD</span>
+                                                        @if (q.CorrectAnswer == "D") { <i class="fas fa-check-circle text-success ml-2"></i> }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">Chưa có dữ liệu cho Part 5.</div>
+                        }
+                    </div>
+
+                    @* ========================================= PART 6 ========================================= *@
+                    <div class="tab-pane fade" id="part6" role="tabpanel" aria-labelledby="part6-tab">
+                        @if (part6 != null)
+                        {
+                            <div class="alert alert-info bg-white border shadow-sm mb-4" style="border-left: 4px solid #0ea5e9 !important; border-radius: 8px;">
+                                <h6 class="font-weight-bold text-dark mb-1"><i class="fas fa-info-circle mr-1 text-info"></i> Hướng dẫn làm bài (Directions):</h6>
+                                <p class="mb-0 text-muted">@(string.IsNullOrWhiteSpace(part6.Directions) ? "Read the texts that follow. A word, phrase, or sentence is missing in parts of each text. Four answer choices for each question are given on below. Select the best answer." : part6.Directions)</p>
+                            </div>
+
+                            @foreach (var grp in part6.QuestionGroups.OrderBy(g => g.OrderIndex))
+                            {
+                                <div class="card shadow-sm border-0 mb-4" id="group-card-@grp.Id" style="border-radius: 10px; overflow: hidden;">
+                                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                                        <h5 class="font-weight-bold text-dark mb-0 grp-title-display">
+                                            <i class="fas fa-layer-group text-info mr-2"></i>@grp.GroupTitle
+                                        </h5>
+                                        <button type="button" class="btn btn-sm btn-outline-info font-weight-bold btn-edit-group"
+                                                data-id="@grp.Id"
+                                                data-title="@grp.GroupTitle"
+                                                data-passage="@grp.PassageText"
+                                                data-image="@grp.ImageUrl"
+                                                data-order="@grp.OrderIndex">
+                                            <i class="fas fa-edit mr-1"></i> Sửa bài đọc / ảnh
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="row">
+                                            <div class="col-lg-7">
+                                                <div class="passage-card mb-3">
+                                                    <div class="passage-text grp-passage-display">@grp.PassageText</div>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(grp.ImageUrl))
+                                                {
+                                                    <div class="text-center my-3 grp-image-container">
+                                                        <img src="@grp.ImageUrl" alt="Hình ảnh bài đọc" class="img-fluid rounded border shadow-sm grp-img-display" style="max-height: 380px;" />
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="col-lg-5">
+                                                @foreach (var q in grp.Questions.OrderBy(x => x.QuestionNumber))
+                                                {
+                                                    <div class="q-card p-3 mb-3" id="question-card-@q.Id">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                            <span class="badge badge-info px-2 py-1 font-weight-bold" style="border-radius: 4px;">Câu @q.QuestionNumber</span>
+                                                            <button type="button" class="btn btn-xs btn-outline-primary btn-edit-question py-1 px-2"
+                                                                    data-id="@q.Id"
+                                                                    data-num="@q.QuestionNumber"
+                                                                    data-text="@q.QuestionText"
+                                                                    data-a="@q.OptionA"
+                                                                    data-b="@q.OptionB"
+                                                                    data-c="@q.OptionC"
+                                                                    data-d="@q.OptionD"
+                                                                    data-ans="@q.CorrectAnswer">
+                                                                <i class="fas fa-edit"></i> Sửa
+                                                            </button>
+                                                        </div>
+                                                        @if (!string.IsNullOrWhiteSpace(q.QuestionText))
+                                                        {
+                                                            <p class="font-weight-bold text-dark mb-2 q-text-display small">@q.QuestionText</p>
+                                                        }
+                                                        <div class="options-container">
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "A" ? "correct" : "") opt-a-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "A" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">A</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionA</span>
+                                                            </div>
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "B" ? "correct" : "") opt-b-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "B" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">B</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionB</span>
+                                                            </div>
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "C" ? "correct" : "") opt-c-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "C" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">C</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionC</span>
+                                                            </div>
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "D" ? "correct" : "") opt-d-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "D" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">D</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionD</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">Chưa có dữ liệu cho Part 6.</div>
+                        }
+                    </div>
+
+                    @* ========================================= PART 7 ========================================= *@
+                    <div class="tab-pane fade" id="part7" role="tabpanel" aria-labelledby="part7-tab">
+                        @if (part7 != null)
+                        {
+                            <div class="alert alert-info bg-white border shadow-sm mb-4" style="border-left: 4px solid #0ea5e9 !important; border-radius: 8px;">
+                                <h6 class="font-weight-bold text-dark mb-1"><i class="fas fa-info-circle mr-1 text-info"></i> Hướng dẫn làm bài (Directions):</h6>
+                                <p class="mb-0 text-muted">@(string.IsNullOrWhiteSpace(part7.Directions) ? "In this part, you will read a selection of texts, such as magazine and newspaper articles, letters, and advertisements. Each text is followed by several questions. Select the best answer for each question." : part7.Directions)</p>
+                            </div>
+
+                            @foreach (var grp in part7.QuestionGroups.OrderBy(g => g.OrderIndex))
+                            {
+                                <div class="card shadow-sm border-0 mb-4" id="group-card-@grp.Id" style="border-radius: 10px; overflow: hidden;">
+                                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                                        <h5 class="font-weight-bold text-dark mb-0 grp-title-display">
+                                            <i class="fas fa-newspaper text-primary mr-2"></i>@grp.GroupTitle
+                                        </h5>
+                                        <button type="button" class="btn btn-sm btn-outline-info font-weight-bold btn-edit-group"
+                                                data-id="@grp.Id"
+                                                data-title="@grp.GroupTitle"
+                                                data-passage="@grp.PassageText"
+                                                data-image="@grp.ImageUrl"
+                                                data-order="@grp.OrderIndex">
+                                            <i class="fas fa-edit mr-1"></i> Sửa bài đọc / ảnh
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="passage-card mb-3" style="border-left-color: #2563eb;">
+                                                    <div class="passage-text grp-passage-display">@grp.PassageText</div>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(grp.ImageUrl))
+                                                {
+                                                    <div class="text-center my-3 grp-image-container">
+                                                        <img src="@grp.ImageUrl" alt="Hình ảnh bài đọc" class="img-fluid rounded border shadow-sm grp-img-display" style="max-height: 420px;" />
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="col-lg-6">
+                                                @foreach (var q in grp.Questions.OrderBy(x => x.QuestionNumber))
+                                                {
+                                                    <div class="q-card p-3 mb-3" id="question-card-@q.Id">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                            <span class="badge badge-primary px-3 py-1 font-weight-bold" style="border-radius: 4px;">Câu @q.QuestionNumber</span>
+                                                            <button type="button" class="btn btn-xs btn-outline-primary btn-edit-question py-1 px-2"
+                                                                    data-id="@q.Id"
+                                                                    data-num="@q.QuestionNumber"
+                                                                    data-text="@q.QuestionText"
+                                                                    data-a="@q.OptionA"
+                                                                    data-b="@q.OptionB"
+                                                                    data-c="@q.OptionC"
+                                                                    data-d="@q.OptionD"
+                                                                    data-ans="@q.CorrectAnswer">
+                                                                <i class="fas fa-edit"></i> Sửa
+                                                            </button>
+                                                        </div>
+                                                        <p class="font-weight-bold text-dark mb-2 q-text-display small">@q.QuestionText</p>
+                                                        <div class="options-container">
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "A" ? "correct" : "") opt-a-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "A" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">A</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionA</span>
+                                                                @if (q.CorrectAnswer == "A") { <i class="fas fa-check-circle text-success ml-1"></i> }
+                                                            </div>
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "B" ? "correct" : "") opt-b-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "B" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">B</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionB</span>
+                                                                @if (q.CorrectAnswer == "B") { <i class="fas fa-check-circle text-success ml-1"></i> }
+                                                            </div>
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "C" ? "correct" : "") opt-c-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "C" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">C</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionC</span>
+                                                                @if (q.CorrectAnswer == "C") { <i class="fas fa-check-circle text-success ml-1"></i> }
+                                                            </div>
+                                                            <div class="option-item py-1 px-2 @(q.CorrectAnswer == "D" ? "correct" : "") opt-d-display small">
+                                                                <span class="badge-ans @(q.CorrectAnswer == "D" ? "badge-success text-white" : "badge-light text-secondary")" style="width:22px;height:22px;font-size:0.75rem;">D</span>
+                                                                <span class="opt-val flex-grow-1">@q.OptionD</span>
+                                                                @if (q.CorrectAnswer == "D") { <i class="fas fa-check-circle text-success ml-1"></i> }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">Chưa có dữ liệu cho Part 7.</div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ========================================= MODAL CHỈNH SỬA CÂU HỎI ========================================= *@
+<div class="modal fade" id="editQuestionModal" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title font-weight-bold" id="editQuestionModalLabel">
+                    <i class="fas fa-edit mr-2"></i>Chỉnh sửa Câu hỏi #<span id="modalQNum"></span>
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="editQId" />
+                <input type="hidden" id="editQNumber" />
+                
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">Nội dung câu hỏi:</label>
+                    <textarea class="form-control" id="editQText" rows="3" placeholder="Nhập nội dung câu hỏi (đối với Part 6 có thể để trống)..."></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold text-secondary">Đáp án A:</label>
+                        <input type="text" class="form-control" id="editOptionA" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold text-secondary">Đáp án B:</label>
+                        <input type="text" class="form-control" id="editOptionB" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold text-secondary">Đáp án C:</label>
+                        <input type="text" class="form-control" id="editOptionC" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold text-secondary">Đáp án D:</label>
+                        <input type="text" class="form-control" id="editOptionD" required />
+                    </div>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="font-weight-bold text-success"><i class="fas fa-check-circle mr-1"></i>Đáp án đúng:</label>
+                    <select class="form-control font-weight-bold text-success" id="editCorrectAnswer" style="font-size: 1.05rem;">
+                        <option value="A">Đáp án A</option>
+                        <option value="B">Đáp án B</option>
+                        <option value="C">Đáp án C</option>
+                        <option value="D">Đáp án D</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary font-weight-bold" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary px-4 font-weight-bold" id="btnSaveQuestion">
+                    <i class="fas fa-save mr-1"></i> Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ========================================= MODAL CHỈNH SỬA ĐOẠN VĂN & HÌNH ẢNH ========================================= *@
+<div class="modal fade" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title font-weight-bold" id="editGroupModalLabel">
+                    <i class="fas fa-layer-group mr-2"></i>Chỉnh sửa Đoạn văn & Hình ảnh
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editGroupForm" enctype="multipart/form-data">
+                    <input type="hidden" id="editGroupId" name="id" />
+                    <input type="hidden" id="editGroupOrder" name="orderIndex" />
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">Tiêu đề nhóm bài đọc:</label>
+                        <input type="text" class="form-control" id="editGroupTitle" name="groupTitle" placeholder="VD: Questions 131-134 refer to the following announcement." />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">Nội dung đoạn văn (Văn bản / Thông báo / Email):</label>
+                        <textarea class="form-control font-monospace" id="editPassageText" name="passageText" rows="8" placeholder="Nội dung bài đọc..."></textarea>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="font-weight-bold text-secondary">Tải lên / Thay thế hình ảnh bài đọc:</label>
+                        <input type="file" class="form-control-file" id="editImageFile" name="imageFile" accept="image/*" />
+                        <small class="form-text text-muted">Chỉ tải lên nếu bài đọc có hình ảnh hoặc biểu đồ mới (PNG, JPG, WEBP).</small>
+                        <div id="groupCurrentImgContainer" class="mt-2 text-center" style="display:none;">
+                            <label class="d-block small text-muted">Ảnh hiện tại:</label>
+                            <img id="groupCurrentImg" src="" class="img-thumbnail" style="max-height: 150px;" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary font-weight-bold" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-info px-4 font-weight-bold text-white" id="btnSaveGroup">
+                    <i class="fas fa-save mr-1"></i> Lưu thay đổi bài đọc
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            // Open Edit Question Modal
+            $('.btn-edit-question').on('click', function () {
+                var btn = $(this);
+                $('#editQId').val(btn.data('id'));
+                $('#editQNumber').val(btn.data('num'));
+                $('#modalQNum').text(btn.data('num'));
+                $('#editQText').val(btn.data('text') || '');
+                $('#editOptionA').val(btn.data('a') || '');
+                $('#editOptionB').val(btn.data('b') || '');
+                $('#editOptionC').val(btn.data('c') || '');
+                $('#editOptionD').val(btn.data('d') || '');
+                $('#editCorrectAnswer').val((btn.data('ans') || 'A').toUpperCase());
+
+                $('#editQuestionModal').modal('show');
+            });
+
+            // Save Question AJAX
+            $('#btnSaveQuestion').on('click', function () {
+                var qId = $('#editQId').val();
+                var qNum = $('#editQNumber').val();
+                var qText = $('#editQText').val();
+                var optA = $('#editOptionA').val();
+                var optB = $('#editOptionB').val();
+                var optC = $('#editOptionC').val();
+                var optD = $('#editOptionD').val();
+                var correctAns = $('#editCorrectAnswer').val();
+
+                if (!optA || !optB || !optC || !optD) {
+                    alert('Vui lòng điền đầy đủ 4 đáp án A, B, C, D!');
+                    return;
+                }
+
+                var data = {
+                    id: parseInt(qId),
+                    questionNumber: parseInt(qNum),
+                    questionText: qText,
+                    optionA: optA,
+                    optionB: optB,
+                    optionC: optC,
+                    optionD: optD,
+                    correctAnswer: correctAns
+                };
+
+                var saveBtn = $(this);
+                saveBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang lưu...');
+
+                $.ajax({
+                    url: '@Url.Action("UpdateQuestion", "Exams")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (res) {
+                        saveBtn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Lưu thay đổi');
+                        if (res.success) {
+                            var card = $('#question-card-' + qId);
+                            card.find('.q-text-display').text(qText);
+                            card.find('.opt-a-display .opt-val').text(optA);
+                            card.find('.opt-b-display .opt-val').text(optB);
+                            card.find('.opt-c-display .opt-val').text(optC);
+                            card.find('.opt-d-display .opt-val').text(optD);
+
+                            card.find('.option-item').removeClass('correct');
+                            card.find('.option-item .badge-ans').removeClass('badge-success').addClass('badge-light text-secondary');
+                            card.find('.option-item .fa-check-circle').remove();
+
+                            var targetClass = '.opt-' + correctAns.toLowerCase() + '-display';
+                            var targetOpt = card.find(targetClass);
+                            targetOpt.addClass('correct');
+                            targetOpt.find('.badge-ans').removeClass('badge-light text-secondary').addClass('badge-success text-white');
+                            targetOpt.append('<i class="fas fa-check-circle text-success ml-2"></i>');
+
+                            var editBtn = card.find('.btn-edit-question');
+                            editBtn.data('text', qText);
+                            editBtn.data('a', optA);
+                            editBtn.data('b', optB);
+                            editBtn.data('c', optC);
+                            editBtn.data('d', optD);
+                            editBtn.data('ans', correctAns);
+
+                            $('#editQuestionModal').modal('hide');
+                        } else {
+                            alert(res.message || 'Lỗi khi cập nhật câu hỏi!');
+                        }
+                    },
+                    error: function () {
+                        saveBtn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Lưu thay đổi');
+                        alert('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
+                    }
+                });
+            });
+
+            // Open Edit Group Modal
+            $('.btn-edit-group').on('click', function () {
+                var btn = $(this);
+                $('#editGroupId').val(btn.data('id'));
+                $('#editGroupOrder').val(btn.data('order'));
+                $('#editGroupTitle').val(btn.data('title') || '');
+                $('#editPassageText').val(btn.data('passage') || '');
+                $('#editImageFile').val('');
+
+                var img = btn.data('image');
+                if (img) {
+                    $('#groupCurrentImg').attr('src', img);
+                    $('#groupCurrentImgContainer').show();
+                } else {
+                    $('#groupCurrentImgContainer').hide();
+                }
+
+                $('#editGroupModal').modal('show');
+            });
+
+            // Save Group AJAX
+            $('#btnSaveGroup').on('click', function () {
+                var form = $('#editGroupForm')[0];
+                var formData = new FormData(form);
+                var gId = $('#editGroupId').val();
+                var gTitle = $('#editGroupTitle').val();
+                var pText = $('#editPassageText').val();
+
+                var saveBtn = $(this);
+                saveBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Đang lưu...');
+
+                $.ajax({
+                    url: '@Url.Action("UpdateQuestionGroup", "Exams")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        saveBtn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Lưu thay đổi bài đọc');
+                        if (res.success) {
+                            var card = $('#group-card-' + gId);
+                            card.find('.grp-title-display').html('<i class="fas fa-layer-group text-info mr-2"></i>' + gTitle);
+                            card.find('.grp-passage-display').text(pText);
+
+                            if (res.imageUrl) {
+                                var imgContainer = card.find('.grp-image-container');
+                                if (imgContainer.length) {
+                                    imgContainer.find('img').attr('src', res.imageUrl);
+                                } else {
+                                    card.find('.passage-card').after('<div class="text-center my-3 grp-image-container"><img src="' + res.imageUrl + '" alt="Hình ảnh bài đọc" class="img-fluid rounded border shadow-sm grp-img-display" style="max-height: 380px;" /></div>');
+                                }
+                                card.find('.btn-edit-group').data('image', res.imageUrl);
+                            }
+
+                            var editBtn = card.find('.btn-edit-group');
+                            editBtn.data('title', gTitle);
+                            editBtn.data('passage', pText);
+
+                            $('#editGroupModal').modal('hide');
+                        } else {
+                            alert(res.message || 'Lỗi khi cập nhật bài đọc!');
+                        }
+                    },
+                    error: function () {
+                        saveBtn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Lưu thay đổi bài đọc');
+                        alert('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,132 @@
+<link rel="shortcut icon" href="~/img/favicon.ico">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- Bootstrap 4.6.2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+<!-- AdminLTE 3.2.0 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+
+<!-- Toastr CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+<!-- Local bundle if available -->
+<link href="~/view-resources/Views/_Bundles/shared-layout.min.css" rel="stylesheet" asp-append-version="true" onerror="this.onerror=null;this.remove();" />
+
+<!-- Modern Custom Styling & Image Fixes -->
+<style>
+    body {
+        font-family: 'Inter', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        background-color: #F8FAFC !important;
+        color: #0F172A;
+    }
+    /* Fix unconstrained avatar and logo image size */
+    .brand-image,
+    .brand-link img {
+        max-height: 33px !important;
+        max-width: 33px !important;
+        width: 33px !important;
+        height: 33px !important;
+        object-fit: cover !important;
+        border-radius: 50% !important;
+    }
+    .brand-link {
+        display: flex !important;
+        align-items: center !important;
+        padding: 0.8125rem 0.8rem !important;
+        background-color: #0F172A !important;
+        border-bottom: 1px solid #1E293B !important;
+    }
+    .user-panel {
+        display: flex !important;
+        align-items: center !important;
+        padding-bottom: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+    .user-panel .image,
+    .user-panel .image img {
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+    }
+    .user-panel .info {
+        padding-left: 10px !important;
+    }
+    /* Elegant Sidebar Styling */
+    .main-sidebar {
+        background-color: #0F172A !important;
+        box-shadow: 2px 0 16px rgba(0,0,0,0.06) !important;
+    }
+    .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link {
+        color: #94A3B8 !important;
+        border-radius: 8px !important;
+        margin-bottom: 3px !important;
+        font-weight: 500 !important;
+    }
+    .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link:hover {
+        background-color: #1E293B !important;
+        color: #FFFFFF !important;
+    }
+    .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+    .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+        background-color: #1E3A8A !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4) !important;
+    }
+    /* Clean Content Wrapper & Layout Alignment */
+    .main-sidebar {
+        width: 250px !important;
+        background-color: #0F172A !important;
+        box-shadow: 2px 0 16px rgba(0,0,0,0.06) !important;
+    }
+    .content-wrapper,
+    .main-header,
+    .main-footer {
+        margin-left: 250px !important;
+        transition: margin-left .3s ease-in-out;
+    }
+    body.sidebar-collapse .content-wrapper,
+    body.sidebar-collapse .main-header,
+    body.sidebar-collapse .main-footer {
+        margin-left: 4.6rem !important;
+    }
+    @@media (max-width: 767.98px) {
+        .content-wrapper,
+        .main-header,
+        .main-footer {
+            margin-left: 0 !important;
+        }
+    }
+    .content-wrapper {
+        background-color: #F8FAFC !important;
+        padding: 1.5rem 2rem !important;
+        min-height: calc(100vh - 60px) !important;
+    }
+    .main-header.navbar {
+        background-color: #FFFFFF !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03) !important;
+    }
+    /* Card Styles */
+    .card {
+        border-radius: 14px !important;
+        border: 1px solid #E2E8F0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    .card-header {
+        border-top-left-radius: 14px !important;
+        border-top-right-radius: 14px !important;
+        border-bottom: 1px solid #F1F5F9 !important;
+    }
+</style>
